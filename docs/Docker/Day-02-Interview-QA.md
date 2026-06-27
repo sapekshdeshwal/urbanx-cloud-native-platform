@@ -1,261 +1,353 @@
-# 🐳 Docker Day 2 – Hands-on Practical
+# 🎤 Docker Day 2 - Interview Questions & Answers
 
 ## 🎯 Objective
 
-Build a custom Docker Image using a Dockerfile and understand how Docker creates images layer by layer.
+Revise the most commonly asked Docker interview questions related to Dockerfile, Docker Images, Layers, Cache, Build Context, and Dockerfile instructions.
 
 ---
 
-# Project Structure
+# 1. What is a Dockerfile?
 
-```
-day-02/
-│
-├── Dockerfile
-└── index.html
-```
+**Answer:**
+
+A Dockerfile is a text file containing a set of instructions used by Docker to build an image automatically.
 
 ---
 
-# Step 1 - Create index.html
+# 2. What is the purpose of FROM?
 
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>UrbanX</title>
-</head>
+**Answer:**
 
-<body style="text-align:center;margin-top:120px;font-family:Arial">
+FROM specifies the base image on which the new Docker image will be built.
 
-<h1>🚀 Welcome to UrbanX</h1>
-
-<h2>Built using Docker</h2>
-
-<p>Created by Sapeksh Deshwal</p>
-
-</body>
-</html>
-```
-
----
-
-# Step 2 - Create Dockerfile
+Example:
 
 ```dockerfile
 FROM nginx
-
-COPY index.html /usr/share/nginx/html/index.html
-
-EXPOSE 80
-
-CMD ["nginx","-g","daemon off;"]
 ```
 
 ---
 
-# Step 3 - Build Docker Image
+# 3. What is COPY?
+
+**Answer:**
+
+COPY copies files and directories from the local machine into the Docker Image.
+
+Example:
+
+```dockerfile
+COPY app.py /app/
+```
+
+---
+
+# 4. What is EXPOSE?
+
+**Answer:**
+
+EXPOSE documents the port on which the application inside the container listens.
+
+It **does not publish the port**.
+
+---
+
+# 5. How do you publish a port?
+
+**Answer:**
+
+Using the `-p` option.
+
+Example:
 
 ```bash
-docker build -t urbanx:v1 .
+docker run -p 8080:80 nginx
 ```
-
-### Explanation
-
-- `docker build` → Build Docker Image
-- `-t` → Tag Image
-- `urbanx` → Image Name
-- `v1` → Version
-- `.` → Current directory is Build Context
 
 ---
 
-# Verify Images
+# 6. What is CMD?
+
+**Answer:**
+
+CMD specifies the default command that runs when the container starts.
+
+---
+
+# 7. Why do we use `daemon off;` with Nginx?
+
+**Answer:**
+
+Docker containers stay alive only while the main process is running.
+
+`daemon off;` keeps Nginx running in the foreground.
+
+---
+
+# 8. What is RUN?
+
+**Answer:**
+
+RUN executes commands during image build.
+
+Example:
+
+```dockerfile
+RUN apt update
+```
+
+---
+
+# 9. Difference between RUN and CMD?
+
+| RUN | CMD |
+|------|------|
+| Executes during build | Executes during container startup |
+| Installs software | Starts the application |
+
+---
+
+# 10. What is WORKDIR?
+
+**Answer:**
+
+WORKDIR sets the current working directory for all subsequent Dockerfile instructions.
+
+---
+
+# 11. Why is WORKDIR preferred over `RUN cd`?
+
+**Answer:**
+
+`RUN cd` affects only that single RUN instruction.
+
+WORKDIR changes the working directory for all following instructions.
+
+---
+
+# 12. What are Docker Layers?
+
+**Answer:**
+
+Docker Images are built layer by layer.
+
+Each major Dockerfile instruction creates a new filesystem layer.
+
+---
+
+# 13. What is Docker Cache?
+
+**Answer:**
+
+Docker reuses unchanged layers to avoid rebuilding them, making image builds much faster.
+
+---
+
+# 14. What does this mean?
+
+```
+CACHED [1/2]
+```
+
+**Answer:**
+
+Docker reused the cached layer because nothing changed in that instruction.
+
+---
+
+# 15. What is Image Immutability?
+
+**Answer:**
+
+Docker Images are immutable.
+
+Once created, they cannot be modified.
+
+A new image is created whenever changes are made.
+
+---
+
+# 16. Difference between Image and Container?
+
+| Image | Container |
+|--------|-----------|
+| Template | Running instance |
+| Read-only | Running process |
+| Immutable | Temporary |
+
+---
+
+# 17. Difference between `docker pull`, `docker build`, and `docker run`?
+
+| Command | Purpose |
+|----------|---------|
+| docker pull | Download image |
+| docker build | Create image |
+| docker run | Start container |
+
+---
+
+# 18. What is Build Context?
+
+**Answer:**
+
+Build Context is the set of files Docker can access during image build.
+
+It is determined by the path passed to:
 
 ```bash
-docker images
-```
-
-Expected Output
-
-```
-urbanx:v1
-
-nginx:latest
+docker build .
 ```
 
 ---
 
-# Run Container
+# 19. Can Docker access files outside the Build Context?
 
-```bash
-docker run -d --name urbanx-container -p 8081:80 urbanx:v1
+**Answer:**
+
+No.
+
+Docker cannot access files outside the Build Context.
+
+---
+
+# 20. Why do we use `.dockerignore`?
+
+**Answer:**
+
+To exclude unnecessary files from the Build Context.
+
+Benefits:
+
+- Faster builds
+- Smaller images
+- Better security
+
+---
+
+# 21. Difference between COPY and ADD?
+
+| COPY | ADD |
+|------|------|
+| Copies files | Copies + Extracts archives |
+| Preferred | Use only when needed |
+
+---
+
+# 22. Which instruction is recommended?
+
+**Answer:**
+
+COPY.
+
+It is simpler, predictable, and follows Docker best practices.
+
+---
+
+# 23. Why should `requirements.txt` be copied before the application code?
+
+**Answer:**
+
+Because Docker can cache the dependency installation layer.
+
+If only the application code changes, Docker reuses the cached dependencies and avoids reinstalling packages.
+
+---
+
+# 24. Why does Docker use layers?
+
+**Answer:**
+
+Layers enable efficient caching, faster builds, and reuse across multiple images.
+
+---
+
+# 25. Why are Docker Images immutable?
+
+**Answer:**
+
+Immutability ensures consistency, versioning, and easy rollback to previous image versions.
+
+---
+
+# 26. Can one Docker Image create multiple containers?
+
+**Answer:**
+
+Yes.
+
+A single Docker Image can be used to create multiple independent containers.
+
+---
+
+# 27. Why did Docker show a container name conflict?
+
+**Answer:**
+
+Container names must be unique on a Docker host.
+
+---
+
+# 28. What happens if the main process exits?
+
+**Answer:**
+
+Docker automatically stops the container because it monitors the main process.
+
+---
+
+# 29. Why is Docker Cache important?
+
+**Answer:**
+
+Docker Cache significantly reduces build time by reusing unchanged layers.
+
+---
+
+# 30. Explain the Docker Image lifecycle.
+
 ```
-
-Explanation
-
-- `-d` → Detached Mode
-- `--name` → Container Name
-- `-p` → Port Mapping
-
-```
-Host
-8081
-
-↓
-
-Container
-80
+Dockerfile
+      │
+docker build
+      │
+Docker Image
+      │
+docker run
+      │
+Docker Container
 ```
 
 ---
 
-# Verify Running Containers
+# ⭐ Key Interview Tips
 
-```bash
-docker ps
-```
-
----
-
-# Open Browser
-
-```
-http://localhost:8081
-```
-
-Expected Output
-
-```
-🚀 Welcome to UrbanX
-
-Built using Docker
-
-Created by Sapeksh Deshwal
-```
+- Understand Dockerfile instructions instead of memorizing them.
+- Explain Docker Cache with examples.
+- Know the difference between RUN and CMD.
+- Understand Build Context and `.dockerignore`.
+- Explain Image vs Container.
+- Explain why containers stop when the main process exits.
+- Explain why COPY is preferred over ADD.
 
 ---
 
-# Build Version 2
+# Final Revision Checklist
 
-Modify
-
-```
-index.html
-```
-
-Build again
-
-```bash
-docker build -t urbanx:v2 .
-```
-
-Docker Output
-
-```
-CACHED [1/2] FROM nginx
-```
-
-Observation
-
-Docker reused Layer 1 because nothing changed.
-
-Only changed layers were rebuilt.
-
----
-
-# Verify Images
-
-```bash
-docker images
-```
-
-Expected
-
-```
-urbanx:v1
-
-urbanx:v2
-```
-
----
-
-# Container Name Conflict
-
-Attempt
-
-```bash
-docker run --name urbanx-container urbanx:v2
-```
-
-Docker Error
-
-```
-Conflict
-
-Container name already exists.
-```
-
-Reason
-
-Container names must be unique.
-
-Solution
-
-```bash
-docker run -d \
---name urbanx-v2-container \
--p 8082:80 \
-urbanx:v2
-```
-
----
-
-# Commands Used
-
-```bash
-docker build -t urbanx:v1 .
-
-docker build -t urbanx:v2 .
-
-docker images
-
-docker ps
-
-docker run -d --name urbanx-container -p 8081:80 urbanx:v1
-
-docker run -d --name urbanx-v2-container -p 8082:80 urbanx:v2
-```
-
----
-
-# Practical Learnings
-
-- Built first custom Docker Image.
-- Understood Dockerfile workflow.
-- Understood Docker Layers.
-- Understood Docker Cache.
-- Understood Image Versioning.
-- Understood Port Mapping.
-- Understood Container Naming.
-- Understood Image Immutability.
-
----
-
-# Common Mistakes
-
-❌ Forgetting the Build Context (`.`)
-
-❌ Using the same container name twice
-
-❌ Forgetting port mapping
-
-❌ Expecting EXPOSE to publish ports
-
-❌ Editing an existing Docker Image instead of creating a new one
-
----
-
-# Summary
-
-Successfully created two Docker Images (`urbanx:v1` and `urbanx:v2`), deployed them as containers, verified Docker Cache behavior, understood image immutability, and practiced the complete Docker image lifecycle from Dockerfile to running container.
+- [ ] Dockerfile
+- [ ] FROM
+- [ ] COPY
+- [ ] EXPOSE
+- [ ] CMD
+- [ ] RUN
+- [ ] WORKDIR
+- [ ] Docker Layers
+- [ ] Docker Cache
+- [ ] Image Immutability
+- [ ] Build Context
+- [ ] .dockerignore
+- [ ] COPY vs ADD
+- [ ] Image vs Container
+- [ ] docker build
+- [ ] docker run
+- [ ] docker pull
